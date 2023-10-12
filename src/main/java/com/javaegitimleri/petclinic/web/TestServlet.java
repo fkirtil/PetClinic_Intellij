@@ -1,4 +1,4 @@
-package com.javaegitimleri.petclinic;
+package com.javaegitimleri.petclinic.web;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

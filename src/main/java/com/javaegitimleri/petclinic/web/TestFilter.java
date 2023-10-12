@@ -1,4 +1,4 @@
-package com.javaegitimleri.petclinic;
+package com.javaegitimleri.petclinic.web;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -6,7 +6,6 @@ import java.io.IOException;
 
 @WebFilter("/TestServlet")
 public class TestFilter implements Filter {
-
     public TestFilter(){
 
     }

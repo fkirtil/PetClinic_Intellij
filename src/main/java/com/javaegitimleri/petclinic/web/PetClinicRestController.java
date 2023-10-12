@@ -1,10 +1,12 @@
-package com.javaegitimleri.petclinic;
+package com.javaegitimleri.petclinic.web;
 
 import com.javaegitimleri.petclinic.exception.InternalServerException;
 import com.javaegitimleri.petclinic.exception.OwnerNotFoundException;
 import com.javaegitimleri.petclinic.model.Owner;
 import com.javaegitimleri.petclinic.service.PetClinicService;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -24,10 +26,11 @@ public class PetClinicRestController {
     private PetClinicService petClinicService;
 
     @RequestMapping(method = RequestMethod.DELETE, value = "/owner/{id}")
-    public ResponseEntity<?> deleteOwner(@PathVariable("id") Long id) {
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteOwner(@PathVariable Long id) {
         try {
+            petClinicService.findOwner(id);
             petClinicService.deleteOwner(id);
-            return ResponseEntity.ok().build();
         } catch (OwnerNotFoundException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -58,7 +61,10 @@ public class PetClinicRestController {
             Long id = owner.getId();
             URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(id).toUri();
             return ResponseEntity.created(location).build();
-        } catch (Exception ex) {
+        } catch (ConstraintViolationException ex){
+            return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+        }
+        catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -68,18 +74,20 @@ public class PetClinicRestController {
         try {
             Owner owner = petClinicService.findOwner(id);
             Link self = ControllerLinkBuilder.linkTo(PetClinicRestController.class).slash("/owner/" + id).withSelfRel();
-            Link create = ControllerLinkBuilder.linkTo(PetClinicRestController.class).slash("/owner" + id).withRel("create");
+            Link create = ControllerLinkBuilder.linkTo(PetClinicRestController.class).slash("/owner/" + id).withRel("create");
             Link update = ControllerLinkBuilder.linkTo(PetClinicRestController.class).slash("/owner/" + id).withRel("update");
             Link delete = ControllerLinkBuilder.linkTo(PetClinicRestController.class).slash("/owner/" + id).withRel("delete");
-            Resource<Owner> resource = new Resource<Owner>(owner, self, create, update, delete);
+            Resource<Owner> resource = new Resource<>(owner, self, create, update, delete);
             return ResponseEntity.ok(resource);
         } catch (OwnerNotFoundException ex) {
             return ResponseEntity.noContent().build();
         }
     }
 
+    @Cacheable("allOwners")
     @RequestMapping(method = RequestMethod.GET, value = "/owners")
     public ResponseEntity<List<Owner>> getOwners(){
+        System.out.println(">>>>inside getOwners...");
         List<Owner> owners = petClinicService.findOwners();
         return ResponseEntity.ok(owners);
     }

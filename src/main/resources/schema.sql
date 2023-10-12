@@ -1,20 +1,37 @@
-create table public.t_owner(
-    id bigint not null,
-    first_name varchar(255),
-    last_name varchar(255)
+-- noinspection SqlNoDataSourceInspectionForFile
+CREATE TABLE USERS(
+                      USERNAME VARCHAR(128) NOT NULL PRIMARY KEY,
+                      PASSWORD VARCHAR(512) NOT NULL,
+                      ENABLED BOOLEAN NOT NULL);
+
+CREATE TABLE AUTHORITIES (
+                             USERNAME VARCHAR(128) NOT NULL,
+                             AUTHORITY VARCHAR(128) NOT NULL);
+
+CREATE UNIQUE INDEX IDX_AUTH_USERNAME ON AUTHORITIES (USERNAME,AUTHORITY);
+
+CREATE TABLE PUBLIC.T_OWNER(
+                               ID BIGINT NOT NULL,
+                               FIRST_NAME VARCHAR(255) NOT NULL,
+                               LAST_NAME VARCHAR(255) NOT NULL
 );
+ALTER TABLE PUBLIC.T_OWNER ADD CONSTRAINT PUBLIC.CONSTRAINT_1 PRIMARY KEY(ID);
 
-create table public.t_pet(
-    id bigint not null,
-    name varchar(255),
-    birt_date date,
-    owner_id bigint
+CREATE TABLE PUBLIC.T_VET(
+                               ID BIGINT NOT NULL,
+                               FIRST_NAME VARCHAR(255) NOT NULL,
+                               LAST_NAME VARCHAR(255) NOT NULL
 );
+ALTER TABLE PUBLIC.T_VET ADD CONSTRAINT PUBLIC.CONSTRAINT_11 PRIMARY KEY(ID);
 
-alter table public.t_owner add constraint public.constraint_1 primary key(id);
+CREATE TABLE PUBLIC.T_PET(
+                             ID BIGINT NOT NULL,
+                             NAME VARCHAR(255),
+                             BIRTH_DATE DATE,
+                             OWNER_ID BIGINT
+);
+ALTER TABLE PUBLIC.T_PET ADD CONSTRAINT PUBLIC.CONSTRAINT_2 PRIMARY KEY(ID);
 
-alter table public.t_pet add constraint public.constraint_2 primary key(id);
+ALTER TABLE PUBLIC.T_PET ADD  CONSTRAINT public.CONSTRAINT_3 FOREIGN KEY(OWNER_ID)  REFERENCES PUBLIC.T_OWNER(ID);
 
-alter table public.t_pet add constraint public.constraint_3 foreign key(owner_id) references public.t_owner(id);
-
-create sequence public.petclinic_sequence start with 100;
+CREATE SEQUENCE PUBLIC.PETCLINIC_SEQUENCE START WITH 100;

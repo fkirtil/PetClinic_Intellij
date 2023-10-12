@@ -1,6 +1,7 @@
-package com.javaegitimleri.petclinic;
+package com.javaegitimleri.petclinic.web;
 
 import com.javaegitimleri.petclinic.service.PetClinicService;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +12,20 @@ import org.springframework.web.servlet.ModelAndView;
 public class PetClinicController {
     @Autowired
     private PetClinicService petClinicService;
+
+    @RequestMapping(value = "/login.html")
+    public ModelAndView login() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("login");
+        return mav;
+    }
+
+    @RequestMapping(value = {"/", "/index.html"})
+    public ModelAndView index() {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("index");
+        return mav;
+    }
 
     @RequestMapping("/owners")
     public ModelAndView getOwners() {
